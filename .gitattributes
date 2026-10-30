@@ -1,0 +1,12 @@
+* text=auto
+
+# 二进制资源，避免行尾/编码转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.zip binary
+*.ttf binary
+*.otf binary
+*.woff2 binary
