@@ -80,6 +80,8 @@ npm run build && npm start
 
 跑通后各自在电脑上确认窗口能开、无报错，即 **Spike-1 通过**；之后再做 Spike-2（SQLite 建库）、Spike-3（真实源播通一集）、Spike-4（打出安装包）。
 
+Spike-2 / Spike-3 另有**无需开窗口**即可在 Node 侧跑通的验证脚本：`npm run spike2`（建库 + 读写断言）、`npm run spike3`（真实公开 HLS 解析断言）。Spike-4 用 `npm run package` 出 NSIS 安装版 + 便携 zip。
+
 ## 提交到 GitHub（只传源码，不传依赖与构建产物）
 
 这个仓库的「框架」——Electron + React + Vite + TypeScript 的脚手架——**它的源码就是要提交的内容**，不是另外要单独处理的对象。上传到 GitHub 的只是源码，依赖和构建产物由协作者本地还原，不入库。
@@ -151,8 +153,9 @@ Spike-1 产出的 `package.json` / 主进程 / 渲染入口 / 共享契约类型
 
 ## 下一步
 
-1. **两人各自 `npm run dev` 验证 Spike-1**（看上节）：窗口能开、原型 CSS 生效、控制台无报错，即 Spike-1 通过。
-2. **Spike-2 / Spike-3 / Spike-4**（[05 §10](docs/design/05-技术选型方案.md)）：SQLite 建库、真实源播通一集、打出安装包。四个 spike 全过才正式开工。
+1. **Spike-1 已通过**：开发者在本地 `npm run dev` 验证窗口可开、原型 CSS 生效、控制台无报错。
+2. **Spike-2 / Spike-3 已完成并各自有验证脚本**（[05 §10](docs/design/05-技术选型方案.md)）：`npm run spike2`、`npm run spike3` 在 Node 侧无界面即可跑通（建库 / 真实公开 HLS 解析）；渲染端已在首页接入 SQLite、并可用 hls.js 播真实源。
+   **Spike-4 配置就绪**：`build` 字段 + `npm run package` 出 NSIS 安装版 + 便携 zip；若本机打包遇电子构建二进制 CDN 瞬时 502，重试或在本机执行 `npm run package` 即可。四个 spike 全过才正式开工。
 3. **S1 骨架**：在 Spike-1 基础上补 `core/`（B 的能力域）、路由、契约初版、迁移与 seed（[06 §2](docs/design/06-开发规范.md) 目录所有权）。
 4. **确认第一版范围**（[09](docs/design/09-第一版范围与迭代计划.md)）：v1 = 动漫分区完整闭环 + 下载与本地资源 + 全站界面还原。
 5. 补齐原型里还没实现的部分（阅读器工具栏：目录 / 书签 / 笔记 / 全文搜索，目前是占位）——是否进第一版取决于 08 的 B2。
