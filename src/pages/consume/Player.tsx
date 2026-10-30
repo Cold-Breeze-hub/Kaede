@@ -4,15 +4,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
-
-interface ResolveResult {
-  ok: boolean;
-  url?: string;
-  kind?: 'hls' | 'mp4';
-  ruleName?: string;
-  candidates?: { ruleId: string; name: string; quality?: string; ok: boolean }[];
-  error?: string;
-}
+import type { PlayerResolveResult } from '../../../shared';
 
 export function Player({
   workId,
@@ -24,14 +16,14 @@ export function Player({
   onClose: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [info, setInfo] = useState<ResolveResult | null>(null);
+  const [info, setInfo] = useState<PlayerResolveResult | null>(null);
 
   useEffect(() => {
     let hls: Hls | null = null;
     let cancelled = false;
 
     (async () => {
-      const res = await window.api.invoke<ResolveResult>('player.resolve', { workId, ep });
+      const res = await window.api.invoke<PlayerResolveResult>('player.resolve', { workId, ep });
       if (cancelled) return;
       setInfo(res);
       if (!res.ok || !res.url) return;

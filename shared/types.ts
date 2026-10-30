@@ -91,3 +91,34 @@ export interface ResolveCandidate {
   /** 选源打分（越高越优先，见 07 选源打分）。 */
   score: number;
 }
+
+// ----------------------------------------------------------------------------
+// 渲染进程 ↔ 主进程 的 IPC 契约返回类型（S1 抽出，A/B 共用，禁止在视图里重定义）。
+// 对应 04 §2 通道白名单 + electron/main.cjs 的 ipcMain.handle 实现。
+// ----------------------------------------------------------------------------
+
+/** 首页书架卡片：`library.home` 通道返回（A 的 discover 与 B 的 consume 都消费）。 */
+export interface HomeItem {
+  id: string;
+  name: string;
+  year: number | null;
+  score: number | null;
+  cover: string | null;
+}
+
+/** 数据库运行统计：`db:stats` 通道返回。 */
+export interface DbStats {
+  tables: number;
+  works: number;
+  episodes: number;
+}
+
+/** 播放器解析结果：`player.resolve` 通道返回（B 的 consume/Player 消费）。 */
+export interface PlayerResolveResult {
+  ok: boolean;
+  url?: string;
+  kind?: 'hls' | 'mp4';
+  ruleName?: string;
+  candidates?: { ruleId: string; name: string; quality?: string; ok: boolean }[];
+  error?: string;
+}

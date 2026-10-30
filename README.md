@@ -14,7 +14,7 @@
 
 把散落在各个资源站的动画、漫画、轻小说、游戏、音乐**按作品聚合成一个入口**，只知道作品名就能找全、接着看。单机自用、不公开分发。
 
-这个仓库现在有四样东西：**一份设计定稿**、**一个把定稿跑起来的网页原型**、**一层把它变成可开发工程的文档**（`docs/design/`），以及**一套已搭好的工程骨架**（Spike-1：Electron 壳 + React + 共享契约类型）。
+这个仓库现在有四样东西：**一份设计定稿**、**一个把定稿跑起来的网页原型**、**一层把它变成可开发工程的文档**（`docs/design/`），以及**一套已搭好的工程骨架**（S1：Electron 壳 + React 视图 + 内核 `core/` + hash 路由 + 共享契约类型，由 Spike-1~4 演进）。
 
 > 上一版 Flutter 桌面实现（`acgn_app` / `acgn_core`，2026-10-27 至 10-30）已整体废弃，
 > 代码与安装包不再保留。实现结果没有达到设计要求，所以退回设计层：先把界面和交互在原型里钉死，
@@ -27,12 +27,24 @@ prototype/    可交互前端原型（定稿现场，纯静态，双击即开）
   index.html    入口
   assets/       app.js · data.js · style.css · covers/
   tools/        批量抓封面脚本
-src/          渲染进程（React 视图，A 独占）
+src/           渲染进程（React 视图）
   main.tsx     入口（导入 prototype 的 style.css，验证 CSS 在壳里还原）
-  App.tsx      Spike-1 证据页（用原型类名渲染）
-shared/       跨端契约类型（A/B 共管，见 shared/types.ts）
-electron/     主进程（Electron 窗口，A 独占）
-scripts/      工程脚本（check-redline.mjs 等）
+  App.tsx      应用壳：hash 路由分发（#/ 首页 · #/player/:id/:ep 播放器）
+  shell/        A 独占：窗口与托盘、路由（src/shell/router.tsx）
+  pages/
+    discover/   A 独占：首页 · 分类页 · 作品区 · 典藏 · 系列页 · 搜索 · 百科（含 Home.tsx）
+    consume/    B 独占：详情 · 播放器 · 阅读器 · 音乐 · 我的 · 下载 · 资源 · 磁盘（含 Player.tsx）
+  components/   A 独占：共用组件（卡片 / 进度条 / 弹层 / 图标 / 样式令牌）
+shared/        跨端契约类型（A/B 共管，见 shared/types.ts）
+electron/      主进程（Electron 窗口 + IPC 注册，A 独占）
+core/          内核（Node 侧，纯逻辑，禁 import src/）
+  db/          ★ 共管：SQLite schema 与迁移（V001__init.sql / migrate.cjs / seed.cjs）
+  player/      B 独占：源解析（resolve-source.cjs）+ hls.js 挂载
+  library/ search/ wiki/          A 独占能力域（预留占位）
+  source/ download/ resource/ disk/ reader/   B 独占能力域（预留占位）
+scripts/       工程脚本（check-redline.mjs · spike-2-check.mjs · spike-3-check.mjs）
+tests/         A 管 e2e/（Playwright）· B 管 unit/（Vitest）（预留占位）
+resources/     ★ 共管资源（图标 / 字体 / 模板 / 地区化字符串，预留占位）
 package.json / vite.config.ts / tsconfig.json   构建与依赖
 docs/         设计定稿、走查记录与工程设计文档
   ACGN聚合软件-设计定稿.md        唯一设计蓝本（v3.3，含 120 条红线）
@@ -41,6 +53,8 @@ docs/         设计定稿、走查记录与工程设计文档
   design/                         工程转化：需求 · 架构 · 数据 · 接口 · 选型 · 规范
   adr/                            已拍板的技术决策记录（不可逆决定留档）
 ```
+
+> 目录所有权见 [06 §2](docs/design/06-开发规范.md)：**A 与 B 在各自目录里并行扩展，跨边界改动只通过 `shared/` 契约**——骨架本身就在保障两人不踩到同一份文件。
 
 改界面的顺序是 **原型 → 定稿文档**，两边必须同步；定稿是判断"这处改动对不对"的唯一依据。
 
@@ -59,7 +73,7 @@ python -m http.server 8080 --directory prototype
 
 ## 本地运行（开发）
 
-> 这是 Spike-1 骨架，目的是**先证明 Electron + Vite + React + TS 这套栈能跑起来、原型 CSS 在壳里能还原**。还不是产品。
+> 这是 S1 正式骨架（由 Spike-1~4 演进）：已证明 Electron + Vite + React + TS 这套栈能跑、原型 CSS 在壳里能还原、SQLite 能建库、真源能播通、安装包能打出。骨架本身已可运行，但各页面与能力域仍是占位，等 A/B 按 [06 §2](docs/design/06-开发规范.md) 各自填充。
 
 ```bash
 # 1) 安装依赖（含 Electron，首次较慢）
@@ -67,8 +81,8 @@ npm install
 
 # 2) 两人各自验证：开发模式（Vite dev server + Electron 窗口）
 npm run dev
-#   → 应弹出一个 1280×800 的窗口，显示 Kaede 首页式卡片网格，
-#     底部一行字「Electron 45 · React 19 · Vite 8 · TypeScript 7 — … Spike-1 通过」。
+#   → 应弹出一个 1280×800 的窗口，显示 Kaede 首页式卡片网格（卡片来自 SQLite），
+#     点「▶ 试播真实源（Spike-3）」或任意卡片会打开播放器并真实播放一段公开 HLS。
 #   → 浏览器控制台（Ctrl+Shift+I）应无报错、无硬编码色值告警。
 
 # 3) 只验证类型与红线（不启动窗口，CI 用）
@@ -154,9 +168,8 @@ Spike-1 产出的 `package.json` / 主进程 / 渲染入口 / 共享契约类型
 ## 下一步
 
 1. **Spike-1 已通过**：开发者在本地 `npm run dev` 验证窗口可开、原型 CSS 生效、控制台无报错。
-2. **Spike-2 / Spike-3 已完成并各自有验证脚本**（[05 §10](docs/design/05-技术选型方案.md)）：`npm run spike2`、`npm run spike3` 在 Node 侧无界面即可跑通（建库 / 真实公开 HLS 解析）；渲染端已在首页接入 SQLite、并可用 hls.js 播真实源。
-   **Spike-4 配置就绪**：`build` 字段 + `npm run package` 出 NSIS 安装版 + 便携 zip；若本机打包遇电子构建二进制 CDN 瞬时 502，重试或在本机执行 `npm run package` 即可。四个 spike 全过才正式开工。
-3. **S1 骨架**：在 Spike-1 基础上补 `core/`（B 的能力域）、路由、契约初版、迁移与 seed（[06 §2](docs/design/06-开发规范.md) 目录所有权）。
+2. **Spike-2 / Spike-3 / Spike-4 已全部完成**：`npm run spike2`、`npm run spike3` 在 Node 侧无界面即可跑通（建库 / 真实公开 HLS 解析）；渲染端已在首页接入 SQLite、并可用 hls.js 播真实源；`npm run package` 本机已实跑出 NSIS 安装版 + 便携 zip 两个产物（若遇电子构建二进制 CDN 瞬时 502，用 `ELECTRON_BUILDER_BINARIES_MIRROR` 指向 npmmirror 镜像即可）。
+3. **S1 骨架已起步**：目录结构（按 [06 §2](docs/design/06-开发规范.md) 的 A/B 所有权）、hash 路由（`src/shell/router.tsx`）、契约初版（`HomeItem` / `DbStats` / `PlayerResolveResult` 已抽进 `shared/`）已落地，`npm run verify` 与 `npm run build` 通过。下一步由 A/B 在各自目录里填充页面与能力域。
 4. **确认第一版范围**（[09](docs/design/09-第一版范围与迭代计划.md)）：v1 = 动漫分区完整闭环 + 下载与本地资源 + 全站界面还原。
 5. 补齐原型里还没实现的部分（阅读器工具栏：目录 / 书签 / 笔记 / 全文搜索，目前是占位）——是否进第一版取决于 08 的 B2。
 
