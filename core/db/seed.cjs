@@ -1,12 +1,12 @@
 'use strict';
 // ============================================================================
-// core/db/seed.cjs — 演示数据（Spike-2）
+// core/db/seed.cjs — 演示数据（初始化）
 // ----------------------------------------------------------------------------
-// 少量动漫作品 + 剧集 + 两条内置「公开 HLS」源规则（供 Spike-3 多源选优）。
+// 少量动漫作品 + 剧集 + 两条内置「公开 HLS」源规则（供多源选优演示）。
 // 幂等：只在 works 为空时写入。
 // ============================================================================
 
-// 真实公开 HLS 测试流（CORS 允许，hls.js 可直接拉）。
+// 真实公开 HLS 流（CORS 允许，hls.js 可直接拉）。
 const REAL_HLS = [
   'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
   'https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8',
@@ -47,7 +47,7 @@ function seed(db) {
       for (let n = 1; n <= 12; n++) insEp.run(w.id, n, `第 ${n} 集`);
     }
 
-    // 两条内置演示规则（声明式 DSL v1 形态；spec_json 仅占位，Spike-3 仅用 play_url）
+    // 两条内置演示规则（声明式 DSL v1 形态；spec_json 仅占位，解析时仅用 play_url）
     insRule.run({
       id: 'demo-hls',
       name: '演示·Mux测试流',

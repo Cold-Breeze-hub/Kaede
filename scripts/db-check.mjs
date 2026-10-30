@@ -1,7 +1,7 @@
 // ============================================================================
-// scripts/spike-2-check.mjs — Spike-2 验证（SQLite 建库 + 读写）
+// scripts/db-check.mjs — 内核回归：SQLite 建库 + 读写
 // 在 Node 侧用 better-sqlite3 真跑 V001 schema，断言建表与读写成功。
-// 运行：npm run spike2
+// 运行：npm run db:check
 // ============================================================================
 import Database from 'better-sqlite3';
 import { readFileSync } from 'node:fs';
@@ -24,7 +24,7 @@ db.exec(schema);
 const tables = db.prepare(`SELECT name FROM sqlite_master WHERE type IN ('table','view')`).all().map((r) => r.name);
 const missing = REQUIRED.filter((t) => !tables.includes(t));
 if (missing.length) {
-  console.error('✗ Spike-2 失败：缺失表', missing);
+  console.error('✗ 数据库检查失败：缺失表', missing);
   process.exit(1);
 }
 
@@ -39,10 +39,10 @@ const readBack = db.prepare(
 ).get(info.lastInsertRowid);
 
 if (!readBack || readBack.wname !== '葬送的芙莉莲') {
-  console.error('✗ Spike-2 失败：读写断言未通过', readBack);
+  console.error('✗ 数据库检查失败：读写断言未通过', readBack);
   process.exit(1);
 }
 
-console.log(`✓ Spike-2 通过：建表 ${tables.length} 张（含 FTS 虚拟表 works_fts）`);
+console.log(`✓ 数据库检查通过：建表 ${tables.length} 张（含 FTS 虚拟表 works_fts）`);
 console.log(`  读回演示数据 => ${readBack.wname} / ${readBack.etitle}`);
 db.close();

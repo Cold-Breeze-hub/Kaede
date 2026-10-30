@@ -1,6 +1,6 @@
-// Spike-3 播放器证据页（B 负责，目录 src/pages/consume 属 B）。
-// 通过 window.api 调主进程 player.resolve，用 hls.js 把真实公开 HLS 挂到 <video>。
-// 本地代理（CORS/Referer 改写）是 S1 的事；此处用 CORS 友好的公开测试流直接验证链路。
+// src/pages/consume/Player.tsx — 播放器（B 负责，目录 src/pages/consume 属 B）
+// 经 window.api 调主进程 player.resolve，用 hls.js 把可播地址挂到 <video>。
+// 本地代理（CORS/Referer 改写）留待后续迭代；此处用 CORS 友好的公开流验证链路。
 
 import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
@@ -53,7 +53,7 @@ export function Player({
     <div className="app">
       <header className="agg-toolbar">
         <span className="brand">Kaede · 播放器</span>
-        <button className="spike-btn" onClick={onClose}>
+        <button className="btn" onClick={onClose}>
           ← 返回
         </button>
       </header>
@@ -64,9 +64,6 @@ export function Player({
           {info?.ok
             ? `源：${info.ruleName} · 候选 ${info.candidates?.length ?? 0} 个`
             : `无法解析：${info?.error ?? '未知'}`}
-        </div>
-        <div className="spike-note">
-          Spike-3 · 若此处出现真实视频画面，说明「搜索 → 详情 → m3u8 → &lt;video&gt; 播放」链路已打通
         </div>
       </main>
     </div>

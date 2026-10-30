@@ -1,10 +1,10 @@
 'use strict';
 // ============================================================================
-// electron/main.cjs — 主进程（Spike-1 ~ 4 演进版）
+// electron/main.cjs — 主进程（开发骨架）
 // ----------------------------------------------------------------------------
-// - Spike-1：Electron 壳 + 加载 Vite / 构建产物
-// - Spike-2：接入 SQLite（打开 + 迁移 + seed），暴露 db:stats / library.home
-// - Spike-3：暴露 player.resolve（真实源解析）
+// - Electron 壳 + 加载 Vite / 构建产物
+// - 接入 SQLite（打开 + 迁移 + seed），暴露 db:stats / library.home
+// - 暴露 player.resolve（真实源解析）
 // - 通道白名单：通过 preload.cjs 暴露 window.api（见 04 §2 铁律 1）
 // ============================================================================
 const { app, BrowserWindow, ipcMain } = require('electron');

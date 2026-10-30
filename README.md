@@ -42,7 +42,7 @@ core/          内核（Node 侧，纯逻辑，禁 import src/）
   player/      B 独占：源解析（resolve-source.cjs）+ hls.js 挂载
   library/ search/ wiki/          A 独占能力域（预留占位）
   source/ download/ resource/ disk/ reader/   B 独占能力域（预留占位）
-scripts/       工程脚本（check-redline.mjs · spike-2-check.mjs · spike-3-check.mjs）
+scripts/       工程脚本（check-redline.mjs · db-check.mjs · source-check.mjs）
 tests/         A 管 e2e/（Playwright）· B 管 unit/（Vitest）（预留占位）
 resources/     ★ 共管资源（图标 / 字体 / 模板 / 地区化字符串，预留占位）
 package.json / vite.config.ts / tsconfig.json   构建与依赖
@@ -82,7 +82,7 @@ npm install
 # 2) 两人各自验证：开发模式（Vite dev server + Electron 窗口）
 npm run dev
 #   → 应弹出一个 1280×800 的窗口，显示 Kaede 首页式卡片网格（卡片来自 SQLite），
-#     点「▶ 试播真实源（Spike-3）」或任意卡片会打开播放器并真实播放一段公开 HLS。
+#     点任意卡片会打开播放器；若机器联网，frieren 卡片会真实播放一段公开 HLS。
 #   → 浏览器控制台（Ctrl+Shift+I）应无报错、无硬编码色值告警。
 
 # 3) 只验证类型与红线（不启动窗口，CI 用）
@@ -92,9 +92,9 @@ npm run verify
 npm run build && npm start
 ```
 
-跑通后各自在电脑上确认窗口能开、无报错，即 **Spike-1 通过**；之后再做 Spike-2（SQLite 建库）、Spike-3（真实源播通一集）、Spike-4（打出安装包）。
+跑通后各自在电脑上确认窗口能开、无报错，即开发环境就绪；骨架所需的内核能力（SQLite 建库、真实源播通、安装包产出）均已验证通过。
 
-Spike-2 / Spike-3 另有**无需开窗口**即可在 Node 侧跑通的验证脚本：`npm run spike2`（建库 + 读写断言）、`npm run spike3`（真实公开 HLS 解析断言）。Spike-4 用 `npm run package` 出 NSIS 安装版 + 便携 zip。
+内核另有**无需开窗口**即可在 Node 侧跑通的回归脚本：`npm run db:check`（建库 + 读写断言）、`npm run source:check`（真实公开 HLS 解析断言）。打包用 `npm run package` 出 NSIS 安装版 + 便携 zip。
 
 ## 提交到 GitHub（只传源码，不传依赖与构建产物）
 
@@ -167,8 +167,8 @@ Spike-1 产出的 `package.json` / 主进程 / 渲染入口 / 共享契约类型
 
 ## 下一步
 
-1. **Spike-1 已通过**：开发者在本地 `npm run dev` 验证窗口可开、原型 CSS 生效、控制台无报错。
-2. **Spike-2 / Spike-3 / Spike-4 已全部完成**：`npm run spike2`、`npm run spike3` 在 Node 侧无界面即可跑通（建库 / 真实公开 HLS 解析）；渲染端已在首页接入 SQLite、并可用 hls.js 播真实源；`npm run package` 本机已实跑出 NSIS 安装版 + 便携 zip 两个产物（若遇电子构建二进制 CDN 瞬时 502，用 `ELECTRON_BUILDER_BINARIES_MIRROR` 指向 npmmirror 镜像即可）。
+1. **开发环境已验证**：开发者在本地 `npm run dev` 验证窗口可开、原型 CSS 生效、控制台无报错。
+2. **内核能力已验证**：`npm run db:check`、`npm run source:check` 在 Node 侧无界面即可跑通（建库 / 真实公开 HLS 解析）；渲染端已在首页接入 SQLite、并可用 hls.js 播真实源；`npm run package` 本机已实跑出 NSIS 安装版 + 便携 zip 两个产物（若遇电子构建二进制 CDN 瞬时 502，用 `ELECTRON_BUILDER_BINARIES_MIRROR` 指向 npmmirror 镜像即可）。
 3. **S1 骨架已起步**：目录结构（按 [06 §2](docs/design/06-开发规范.md) 的 A/B 所有权）、hash 路由（`src/shell/router.tsx`）、契约初版（`HomeItem` / `DbStats` / `PlayerResolveResult` 已抽进 `shared/`）已落地，`npm run verify` 与 `npm run build` 通过。下一步由 A/B 在各自目录里填充页面与能力域。
 4. **确认第一版范围**（[09](docs/design/09-第一版范围与迭代计划.md)）：v1 = 动漫分区完整闭环 + 下载与本地资源 + 全站界面还原。
 5. 补齐原型里还没实现的部分（阅读器工具栏：目录 / 书签 / 笔记 / 全文搜索，目前是占位）——是否进第一版取决于 08 的 B2。

@@ -1,6 +1,6 @@
 'use strict';
 // ============================================================================
-// core/player/resolve-source.cjs — 选源解析（Spike-3）
+// core/player/resolve-source.cjs — 选源解析
 // ----------------------------------------------------------------------------
 // 与 docs/design/04-接口与源规则规范 §3.3 选源算法对齐：
 //   排序 = ok desc, health desc, latency asc

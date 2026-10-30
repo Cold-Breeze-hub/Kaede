@@ -1,9 +1,8 @@
 // ============================================================================
 // src/pages/discover/Home.tsx — 首页（A 独占，属 src/pages/discover）
 // ----------------------------------------------------------------------------
-// Spike-1/2/3 的综合证据页被搬到这里，成为 S1 首页骨架：
-//   - 卡片数据来自 SQLite（Spike-2：library.home）
-//   - 「试播真实源」跳到播放器，用 hls.js 播真实公开 HLS（Spike-3 真源链路）
+// 数据来自 SQLite（core/db 迁移 + seed；经主进程 library.home 暴露）。
+// 点击卡片跳转到播放器（B 的 consume/Player），验证「壳 → 首页 → 播放」链路。
 // 本页只负责「展示 + 跳转」，不碰播放/解析——那些在 B 的 consume/ 与 core/player。
 // ============================================================================
 import { useEffect, useState } from 'react';
@@ -31,21 +30,22 @@ export function Home() {
     })();
   }, []);
 
-  const openPlayer = (workId: string) => navigate(`/player/${workId}/1`);
+  const open = (workId: string) => navigate(`/player/${workId}/1`);
 
   return (
     <div className="app">
       <header className="agg-toolbar">
         <span className="brand">Kaede</span>
-        <span className="spike-note">
-          Spike-2 · 数据来自 SQLite（
-          {stats ? `${stats.works} 部作品 / ${stats.episodes} 集 / ${stats.tables} 张表` : '加载中…'}）
-        </span>
+        {stats && (
+          <span className="note">
+            {stats.works} 部作品 · {stats.episodes} 集 · {stats.tables} 张表
+          </span>
+        )}
       </header>
 
       <main className="shelf">
         <div className="shelf-row">
-          <h2 className="shelf-title">动漫 · 全部（来自数据库）</h2>
+          <h2 className="shelf-title">动漫 · 全部</h2>
         </div>
 
         <div className="shelf-grid">
@@ -55,9 +55,9 @@ export function Home() {
               key={w.id}
               role="button"
               tabIndex={0}
-              onClick={() => openPlayer(w.id)}
+              onClick={() => open(w.id)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') openPlayer(w.id);
+                if (e.key === 'Enter' || e.key === ' ') open(w.id);
               }}
             >
               <div className="cover" />
@@ -72,15 +72,6 @@ export function Home() {
           ))}
         </div>
       </main>
-
-      <footer className="agg-toolbar">
-        <button className="spike-btn" onClick={() => openPlayer('frieren')}>
-          ▶ 试播真实源（Spike-3）
-        </button>
-        <span className="spike-note">
-          Electron 45 · React 19 · Vite 8 · TypeScript 7 · SQLite · hls.js
-        </span>
-      </footer>
     </div>
   );
 }

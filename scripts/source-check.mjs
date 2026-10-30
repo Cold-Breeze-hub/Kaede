@@ -1,7 +1,7 @@
 // ============================================================================
-// scripts/spike-3-check.mjs — Spike-3 验证（真实源解析出可播 HLS 地址）
+// scripts/source-check.mjs — 内核回归：真实源解析
 // 把真实公开 HLS 源写进库，验证：①选源打分纯函数 ②resolveSource 产出真实 m3u8。
-// 运行：npm run spike3
+// 运行：npm run source:check
 // ============================================================================
 import Database from 'better-sqlite3';
 import { readFileSync } from 'node:fs';
@@ -26,18 +26,18 @@ const best = pickBest([
   { ok: 1, health: 0.95, latency_ms: 10 },
 ]);
 if (!best || best.health !== 0.95) {
-  console.error('✗ Spike-3 失败：选源打分错误', best);
+  console.error('✗ 源解析检查失败：选源打分错误', best);
   process.exit(1);
 }
 
 // ② 真实源解析：frieren 第 1 集应解析出真实公开 m3u8
 const res = resolveSource(db, 'frieren', 1);
 if (!res.ok || !res.url || !res.url.endsWith('.m3u8')) {
-  console.error('✗ Spike-3 失败：未解析出真实 HLS 地址', res);
+  console.error('✗ 源解析检查失败：未解析出真实 HLS 地址', res);
   process.exit(1);
 }
 
-console.log('✓ Spike-3 通过：选源打分正确，真实公开 HLS 地址已解析');
+console.log('✓ 源解析检查通过：选源打分正确，真实公开 HLS 地址已解析');
 console.log('  播放地址 =>', res.url);
 console.log('  候选源数 =>', res.candidates.length, `（${res.candidates.map((c) => c.name).join(' / ')}）`);
 db.close();
