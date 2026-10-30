@@ -1,0 +1,36 @@
+/* src/app.css — 全局基础样式（不污染 prototype 设计令牌源）
+   仅布局与控件外形；颜色借用原型令牌，兜底用中性色。 */
+.btn {
+  appearance: none;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  background: var(--c-accent, #6e675f);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.btn:hover { opacity: 0.9; }
+
+.player-stage {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+.player-video {
+  width: 100%;
+  max-height: 70vh;
+  background: #000;
+  border-radius: 8px;
+}
+.player-meta {
+  font-size: 13px;
+  opacity: 0.8;
+}
+.note {
+  font-size: 12px;
+  opacity: 0.7;
+}

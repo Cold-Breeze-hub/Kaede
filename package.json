@@ -1,0 +1,75 @@
+{
+  "name": "kaede",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Kaede · ACGN 多源聚合桌面软件（开发骨架：Electron 壳 + React 视图 + 内核 core/ + 共享契约）",
+  "main": "electron/main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n vite,electron \"vite\" \"cross-env ELECTRON_RENDERER_URL=http://localhost:5173 wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build",
+    "start": "electron .",
+    "typecheck": "tsc --noEmit",
+    "verify": "tsc --noEmit && node scripts/check-redline.mjs",
+    "redline": "node scripts/check-redline.mjs",
+    "package": "vite build && electron-builder --win --x64",
+    "db:check": "node scripts/db-check.mjs",
+    "source:check": "node scripts/source-check.mjs"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "hls.js": "^1.7.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "cross-env": "^10.1.0",
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "wait-on": "^8.0.0"
+  },
+  "build": {
+    "appId": "com.kaede.desktop",
+    "productName": "Kaede",
+    "copyright": "Copyright © 2026 Kaede",
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "core/**/*",
+      "preload.cjs",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": "x64"
+        },
+        {
+          "target": "portable",
+          "arch": "x64"
+        }
+      ],
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
+    }
+  }
+}
